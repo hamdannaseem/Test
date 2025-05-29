@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,14 +10,17 @@ public class PlayerMovement : MonoBehaviour
     float TargetTrack = 0;
     public static int Score = 0;
     public static bool GameOver = false;
-    public Text ScoreUI, WinResult;
-    public GameObject EndUI;
-    bool hasEnded=false;
+    public Text ScoreUI, WinResult, AchievementScore;
+    public GameObject EndUI, Achievement;
+    bool hasEnded = false;
+    int[] achievements = { 75, 125, 250, 500, 1000 };
+    int targetAchievement;
     void Start()
     {
         pm = this;
         Debug.Log(PlayerPrefs.GetString("CurrentPlayer"));
         bool hasEnded = false;
+        targetAchievement = 1;
     }
     void Update()
     {
@@ -47,6 +51,18 @@ public class PlayerMovement : MonoBehaviour
         {
             collision.gameObject.SetActive(false);
             ScoreUI.text = "Score:" + (++Score);
+            if (Score == achievements[targetAchievement - 1])
+            {
+                string ach = "Achievement_";
+                if (PlayerPrefs.GetInt(ach + targetAchievement) == 0)
+                {
+                    PlayerPrefs.SetInt(ach + targetAchievement, 1);
+                    Debug.Log("Achievement Unlocked!");
+                    AchievementScore.text = achievements[targetAchievement - 1] + " GOLD";
+                    StartCoroutine("AchievementUI");
+                }
+                targetAchievement++;
+            }
         }
         if (collision.collider.tag == "Obstacle")
         {
@@ -54,6 +70,12 @@ public class PlayerMovement : MonoBehaviour
             GameOver = true;
             EndGame();
         }
+    }
+    IEnumerator AchievementUI()
+    {
+        Achievement.SetActive(true);
+        yield return new WaitForSeconds(3);
+        Achievement.SetActive(false);
     }
     void EndGame()
     {
@@ -88,6 +110,7 @@ public class PlayerMovement : MonoBehaviour
         }
         PlayerPrefs.Save();
         Score = 0;
+        targetAchievement = 1;
     }
 
 }
