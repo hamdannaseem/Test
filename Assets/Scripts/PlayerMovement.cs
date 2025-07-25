@@ -109,6 +109,7 @@ public class PlayerMovement : MonoBehaviour
             PlayerPrefs.SetString(("LeaderName_" + i), PlayerPrefs.GetString("CurrentPlayer"));
         }
         PlayerPrefs.Save();
+        AnalyticsSimple.AccessInstance.TrackRunEnd();
         Score = 0;
         targetAchievement = 1;
     }
